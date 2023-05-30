@@ -1,7 +1,7 @@
 import { useContext, useEffect, useState } from "react";
 import { Column } from "../utils/Column";
 import { Theme } from "../utils/Theme";
-import { ContactContext } from "./ContactProvider";
+import { ContactContext, IGroup } from "./ContactProvider";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
@@ -25,6 +25,7 @@ interface IMessage {
   content: string;
   timestamp: number;
   from: string;
+  username: string;
 }
 export const GroupContent = () => {
   const { getActiveGroup } = useContext(ContactContext);
@@ -40,6 +41,7 @@ export const GroupContent = () => {
   const [messages, setMessages] = useState([] as IMessage[]);
   const { socket } = useContext(SocketContext);
   const { getToken, authUserEmail } = useContext(AuthContext);
+
   const onSubmit = async (data: FormData) => {
     try {
       const groupTo = getActiveGroup();
@@ -52,13 +54,6 @@ export const GroupContent = () => {
         token: getToken(),
       });
 
-      //   setMessages((m) =>
-      //     m.concat({
-      //       content: data.message,
-      //       timestamp: Date.now(),
-      //       from: authUserEmail(),
-      //     })
-      //   );
       reset({ message: "" });
     } catch (error: any) {
       toast.error("Error sending message");
@@ -67,20 +62,20 @@ export const GroupContent = () => {
   useEffect(() => {
     if (!socket) return;
     socket.on("group_message", (args: any) => {
-      const { content, from, timestamp } = args;
-      setMessages((m) => m.concat({ content, timestamp, from }));
+      const { content, from, timestamp, username } = args;
+      setMessages((m) => m.concat({ content, timestamp, from, username }));
     });
-  }, [socket]);
+  }, [socket, setMessages]);
 
   const [loading, setLoading] = useState(false);
-  const fetchUsers = async (activeContact: IContact) => {
+  const fetchChats = async (activeGroup: IGroup) => {
     setLoading(true);
     try {
-      const response = await fetch(backendUrl + "message/chats", {
+      const response = await fetch(backendUrl + "message/group-chats", {
         method: "POST",
         body: JSON.stringify({
           token: getToken(),
-          email: activeContact.email,
+          to: activeGroup.id,
         }),
         headers: {
           "Content-Type": "application/json",
@@ -95,13 +90,13 @@ export const GroupContent = () => {
     }
     setLoading(false);
   };
-  //   useEffect(() => {
-  //     const activeContact = getActiveContact();
-  //     if (!activeContact) return;
-  //     fetchUsers(activeContact);
-  //   }, [getActiveContact]);
+  useEffect(() => {
+    const activeContact = getActiveGroup();
+    if (!activeContact) return;
+    fetchChats(activeContact);
+  }, [getActiveGroup]);
 
-  //   if (!getActiveContact()) return null;
+  if (!getActiveGroup()) return null;
   if (loading) {
     return <LoadingComponent />;
   }
@@ -181,11 +176,11 @@ export const GroupContent = () => {
           overflow: "scroll",
         }}
       >
-        {/* {messages
+        {messages
           //   .slice()
           //   .reverse()
           .map((m) => {
-            const isActiveContact = m.from !== getActiveContact()?.email;
+            const isActiveContact = m.from === authUserEmail();
             return (
               <Row
                 className={css`
@@ -205,6 +200,8 @@ export const GroupContent = () => {
                       ${isActiveContact ? "24px" : "12px"};
                   `}
                 >
+                  <span>{m.username}</span>
+
                   <span>{m.content}</span>
                   <span
                     style={{
@@ -218,7 +215,7 @@ export const GroupContent = () => {
                 </Column>
               </Row>
             );
-          })} */}
+          })}
       </Column>
     </Column>
   );
