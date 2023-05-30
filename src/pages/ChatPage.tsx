@@ -1,6 +1,6 @@
-import { useContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import { Column } from "../utils/Column";
-import { io } from "socket.io-client";
+import { Socket, io } from "socket.io-client";
 import { backendUrl } from "../backendUrl";
 import { AuthContext } from "./AuthProvider";
 import toast from "react-hot-toast";
@@ -9,28 +9,29 @@ import { Theme } from "../utils/Theme";
 import { ContactList } from "./ContactList";
 import { AnonAvatar } from "./AnonAvatar";
 import { css } from "@emotion/css";
+import { ContactProvider } from "./ContactProvider";
+import { ChatContent } from "./ChatContent";
 export interface IContact {
   email: string;
   username: string;
 }
 
+export const SocketContext = createContext({
+  socket: null as null | Socket,
+});
+
 export const ChatPage = () => {
   const { authUserEmail, getToken } = useContext(AuthContext);
+  const [socket, setSocket] = useState(null as null | Socket);
   useEffect(() => {
     const socket = io(backendUrl, { query: { token: getToken() } });
     console.log("connecting");
-
-    socket.on("private_message", (args) => {
-      toast(`
-        From: ${args.from}
-        Message: ${args.content}
-      `);
-    });
+    setSocket(socket);
 
     socket.on("error", () => {
       console.log("An error occurred");
     });
-  }, []);
+  }, [getToken]);
 
   const [contacts, setContacts] = useState([] as IContact[]);
   const [loading, setLoading] = useState(false);
@@ -59,83 +60,81 @@ export const ChatPage = () => {
     return <h2>Loading...</h2>;
   }
   return (
-    <Column
-      style={{
-        height: "100%",
-        position: "relative",
-      }}
-    >
-      <Row
-        style={{
-          backgroundColor: Theme.colors.gray[800],
-          borderRadius: "2px",
-          height: "90%",
-          position: "relative",
-          alignItems: "flex-start",
-        }}
-      >
-        <ContactList contacts={contacts} />
+    <SocketContext.Provider value={{ socket }}>
+      <ContactProvider>
         <Column
           style={{
             height: "100%",
-            width: "100%",
+            position: "relative",
           }}
         >
           <Row
             style={{
-              justifyContent: "space-between",
-              padding: "12px",
+              backgroundColor: Theme.colors.gray[800],
+              borderRadius: "2px",
+              height: "90%",
+              position: "relative",
+              alignItems: "flex-start",
             }}
           >
-            <Row
-              gap={12}
+            <ContactList contacts={contacts} />
+            <Column
               style={{
-                width: "300px",
+                height: "100%",
+                width: "100%",
               }}
             >
-              <AnonAvatar />
-              <Column
+              <Row
                 style={{
-                  flex: 1,
+                  justifyContent: "space-between",
+                  padding: "12px",
                 }}
               >
                 <Row
+                  gap={12}
                   style={{
-                    flex: 1,
-                    justifyContent: "space-between",
+                    width: "300px",
                   }}
                 >
-                  <span
+                  <AnonAvatar />
+                  <Column
                     style={{
-                      fontWeight: 700,
+                      flex: 1,
                     }}
                   >
-                    {"HelloUser"}
-                  </span>
+                    <Row
+                      style={{
+                        flex: 1,
+                        justifyContent: "space-between",
+                      }}
+                    >
+                      <span
+                        style={{
+                          fontWeight: 700,
+                        }}
+                      >
+                        {"HelloUser"}
+                      </span>
+                    </Row>
+                    <span
+                      style={{
+                        opacity: 0.6,
+                      }}
+                    >
+                      Bio goes here
+                    </span>
+                  </Column>
                 </Row>
-                <span
-                  style={{
-                    opacity: 0.6,
-                  }}
-                >
-                  Bio goes here
-                </span>
-              </Column>
-            </Row>
-            <Row gap={12}>
-              <span className="material-symbols-outlined">call</span>
-              <span className="material-symbols-outlined">search</span>
-            </Row>
+                <Row gap={12}>
+                  <span className="material-symbols-outlined">call</span>
+                  <span className="material-symbols-outlined">search</span>
+                </Row>
+              </Row>
+              <ChatContent />
+            </Column>
           </Row>
-          <Column
-            style={{
-              width: "100%",
-              height: "100%",
-              backgroundColor: Theme.colors.gray[700],
-            }}
-          ></Column>
         </Column>
-      </Row>
-    </Column>
+      </ContactProvider>
+    </SocketContext.Provider>
   );
 };

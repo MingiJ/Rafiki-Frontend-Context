@@ -1,12 +1,15 @@
-import { FC } from "react";
+import { FC, useContext } from "react";
 import { Column } from "../utils/Column";
 import { Row } from "../utils/Row";
 import { Theme } from "../utils/Theme";
 import { AnonAvatar } from "./AnonAvatar";
 import { css } from "@emotion/css";
 import { IContact } from "./ChatPage";
+import { ContactContext } from "./ContactProvider";
 
 export const ContactList: FC<{ contacts: IContact[] }> = ({ contacts }) => {
+  const { getActiveContact, setActiveContact } = useContext(ContactContext);
+  const activeContact = getActiveContact();
   return (
     <Column
       gap={36}
@@ -37,10 +40,28 @@ export const ContactList: FC<{ contacts: IContact[] }> = ({ contacts }) => {
         <h2>Contacts</h2>
         {contacts.map((c) => (
           <Row
+            onClick={() => {
+              if (activeContact == c) {
+                setActiveContact(null);
+                return;
+              }
+              setActiveContact(c);
+            }}
             gap={12}
             style={{
               width: "300px",
+              padding: "12px",
+              borderRadius: "6px",
             }}
+            className={css`
+              background: ${activeContact == c
+                ? "linear-gradient(72.47deg, #7367F0 22.16%, rgba(115, 103, 240, 0.7) 76.47%)"
+                : "transparent"};
+              cursor: pointer;
+              &:hover {
+                background-color: ${Theme.colors.gray[600]};
+              }
+            `}
           >
             <AnonAvatar />
             <Column
