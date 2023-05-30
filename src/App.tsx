@@ -7,6 +7,7 @@ import { Dashboard } from "./pages/Dashboard";
 import { Toaster } from "react-hot-toast";
 import { AuthProvider } from "./pages/AuthProvider";
 import { LogInPage } from "./pages/LogInPage";
+import { ContactProvider } from "./pages/ContactProvider";
 
 const App = () => {
   return (

@@ -9,8 +9,9 @@ import { Theme } from "../utils/Theme";
 import { ContactList } from "./ContactList";
 import { AnonAvatar } from "./AnonAvatar";
 import { css } from "@emotion/css";
-import { ContactProvider } from "./ContactProvider";
+import { ContactContext, ContactProvider, IGroup } from "./ContactProvider";
 import { ChatContent } from "./ChatContent";
+import { GroupContent } from "./GroupContent";
 export interface IContact {
   email: string;
   username: string;
@@ -32,7 +33,7 @@ export const ChatPage = () => {
       console.log("An error occurred");
     });
   }, [getToken]);
-
+  const [groups, setGroups] = useState([] as IGroup[]);
   const [contacts, setContacts] = useState([] as IContact[]);
   const [loading, setLoading] = useState(false);
   const fetchUsers = async () => {
@@ -53,87 +54,108 @@ export const ChatPage = () => {
     }
     setLoading(false);
   };
+  const fetchGroups = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch(backendUrl + "group/get", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          token: getToken(),
+        }),
+      });
+      if (response.status !== 200) throw new Error(await response.text());
+      const { groups } = await response.json();
+      setGroups(groups);
+    } catch (error: any) {
+      console.error(error);
+      toast.error("Error");
+    }
+    setLoading(false);
+  };
   useEffect(() => {
     fetchUsers();
+    fetchGroups();
   }, []);
+  const { getActiveContact } = useContext(ContactContext);
   if (loading) {
     return <h2>Loading...</h2>;
   }
   return (
     <SocketContext.Provider value={{ socket }}>
-      <ContactProvider>
-        <Column
+      <Column
+        style={{
+          position: "relative",
+          height: "90%",
+        }}
+      >
+        <Row
           style={{
+            backgroundColor: Theme.colors.gray[800],
+            borderRadius: "2px",
             position: "relative",
-            height: "90%",
+            alignItems: "flex-start",
+            height: "100%",
           }}
         >
-          <Row
+          <ContactList contacts={contacts} groups={groups} />
+          <Column
             style={{
-              backgroundColor: Theme.colors.gray[800],
-              borderRadius: "2px",
-              position: "relative",
-              alignItems: "flex-start",
-              height: "100%",
+              flex: 1,
             }}
           >
-            <ContactList contacts={contacts} />
-            <Column
+            <Row
               style={{
-                flex: 1,
+                justifyContent: "space-between",
+                padding: "12px",
               }}
             >
               <Row
+                gap={12}
                 style={{
-                  justifyContent: "space-between",
-                  padding: "12px",
+                  width: "300px",
                 }}
               >
-                <Row
-                  gap={12}
+                <AnonAvatar />
+                <Column
                   style={{
-                    width: "300px",
+                    flex: 1,
                   }}
                 >
-                  <AnonAvatar />
-                  <Column
+                  <Row
                     style={{
                       flex: 1,
+                      justifyContent: "space-between",
                     }}
                   >
-                    <Row
-                      style={{
-                        flex: 1,
-                        justifyContent: "space-between",
-                      }}
-                    >
-                      <span
-                        style={{
-                          fontWeight: 700,
-                        }}
-                      >
-                        {"HelloUser"}
-                      </span>
-                    </Row>
                     <span
                       style={{
-                        opacity: 0.6,
+                        fontWeight: 700,
                       }}
                     >
-                      Bio goes here
+                      {"HelloUser"}
                     </span>
-                  </Column>
-                </Row>
-                <Row gap={12}>
-                  <span className="material-symbols-outlined">call</span>
-                  <span className="material-symbols-outlined">search</span>
-                </Row>
+                  </Row>
+                  <span
+                    style={{
+                      opacity: 0.6,
+                    }}
+                  >
+                    Bio goes here
+                  </span>
+                </Column>
               </Row>
-              <ChatContent />
-            </Column>
-          </Row>
-        </Column>
-      </ContactProvider>
+              <Row gap={12}>
+                <span className="material-symbols-outlined">call</span>
+                <span className="material-symbols-outlined">search</span>
+              </Row>
+            </Row>
+            {getActiveContact() ? <ChatContent /> : <GroupContent />}
+          </Column>
+        </Row>
+      </Column>
     </SocketContext.Provider>
   );
 };

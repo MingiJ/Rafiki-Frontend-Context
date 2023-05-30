@@ -1,2 +1,7 @@
-contact
-active contact - messages current user, active contact
+create group
+
+name, owner - current user, members -> create
+
+load groups either yeye ni owner ama member
+
+messages -> group id
