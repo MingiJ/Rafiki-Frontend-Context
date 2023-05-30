@@ -1,5 +1,6 @@
 import { FC, PropsWithChildren, createContext } from "react";
 import { useLocalStorage } from "./useLocalStorage";
+import jwtDecode from "jwt-decode";
 
 export const AuthContext = createContext({
   getToken(): string {
@@ -13,6 +14,9 @@ export const AuthContext = createContext({
   },
   isAuthenticated(): boolean {
     return false;
+  },
+  authUserEmail(): string {
+    throw new Error("User not logged in");
   },
 });
 
@@ -35,6 +39,15 @@ export const AuthProvider: FC<PropsWithChildren> = ({ children }) => {
         },
         isAuthenticated() {
           return token !== null;
+        },
+        authUserEmail() {
+          if (!token) {
+            throw new Error("User not logged in");
+          }
+          const decoded = jwtDecode<{ email: string }>(token);
+          if (typeof decoded.email !== "string")
+            throw new Error("Invalid login");
+          return decoded.email;
         },
       }}
     >

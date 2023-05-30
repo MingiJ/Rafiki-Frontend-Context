@@ -24,6 +24,7 @@ export const Dashboard = () => {
         style={{
           padding: "12px",
           width: "100%",
+          height: "100%",
         }}
       >
         <Row
