@@ -64,24 +64,23 @@ export const ChatPage = () => {
       <ContactProvider>
         <Column
           style={{
-            height: "100%",
             position: "relative",
+            height: "90%",
           }}
         >
           <Row
             style={{
               backgroundColor: Theme.colors.gray[800],
               borderRadius: "2px",
-              height: "90%",
               position: "relative",
               alignItems: "flex-start",
+              height: "100%",
             }}
           >
             <ContactList contacts={contacts} />
             <Column
               style={{
-                height: "100%",
-                width: "100%",
+                flex: 1,
               }}
             >
               <Row

@@ -12,6 +12,7 @@ import { IContact, SocketContext } from "./ChatPage";
 import { AuthContext } from "./AuthProvider";
 import { backendUrl } from "../backendUrl";
 import { LoadingComponent } from "../utils/LoadingComponent";
+import { formatDistanceToNow } from "date-fns";
 
 const schema = yup
   .object({
@@ -107,37 +108,11 @@ export const ChatContent = () => {
   return (
     <Column
       style={{
-        width: "100%",
-        height: "100%",
+        maxHeight: "80.2vh",
         backgroundColor: Theme.colors.gray[700],
-        justifyContent: "flex-end",
+        flexDirection: "column-reverse",
       }}
     >
-      <Column
-        style={{
-          padding: "12px",
-        }}
-      >
-        {messages.map((m) => (
-          <Row
-            className={css`
-              justify-content: ${m.from !== getActiveContact()?.email
-                ? "flex-end"
-                : "flex-start"};
-            `}
-          >
-            <span
-              className={css`
-                background-color: ${Theme.colors.gray[600]};
-                padding: 12px;
-                border-radius: 6px;
-              `}
-            >
-              {m.content}
-            </span>
-          </Row>
-        ))}
-      </Column>
       <Row
         style={{
           width: "100%",
@@ -173,6 +148,78 @@ export const ChatContent = () => {
           send
         </span>
       </Row>
+      <Column
+        gap={24}
+        className={css`
+          /* width */
+          ::-webkit-scrollbar {
+            opacity: 0;
+            width: 0;
+          }
+
+          /* Track */
+          //   ::-webkit-scrollbar-track {
+          //     background: #f1f1f1;
+          //   }
+
+          /* Handle */
+          //   ::-webkit-scrollbar-thumb {
+          //     background: #888;
+          //   }
+
+          /* Handle on hover */
+          //   ::-webkit-scrollbar-thumb:hover {
+          //     background: #555;
+          //   }
+        `}
+        ref={(element) => {
+          if (!element) return;
+          element.scrollTop = element.scrollHeight;
+        }}
+        style={{
+          padding: "12px",
+          overflow: "scroll",
+        }}
+      >
+        {messages
+          //   .slice()
+          //   .reverse()
+          .map((m) => {
+            const isActiveContact = m.from !== getActiveContact()?.email;
+            return (
+              <Row
+                className={css`
+                  justify-content: ${isActiveContact
+                    ? "flex-end"
+                    : "flex-start"};
+                `}
+              >
+                <Column
+                  gap={6}
+                  className={css`
+                    background-color: ${Theme.colors.gray[600]};
+                    padding: 12px;
+                    border-radius: 6px;
+                    align-items: ${isActiveContact ? "flex-end" : "flex-start"};
+                    padding: 12px ${isActiveContact ? "12px" : "24px"} 12px
+                      ${isActiveContact ? "24px" : "12px"};
+                  `}
+                >
+                  <span>{m.content}</span>
+                  <span
+                    style={{
+                      opacity: 0.4,
+                    }}
+                  >
+                    {formatDistanceToNow(new Date(m.timestamp), {
+                      addSuffix: true,
+                    })}
+                  </span>
+                </Column>
+              </Row>
+            );
+          })}
+      </Column>
     </Column>
   );
 };
