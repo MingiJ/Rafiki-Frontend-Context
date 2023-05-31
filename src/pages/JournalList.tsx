@@ -12,6 +12,7 @@ import { AddJournalEntry } from "../modals/AddJournalEntry";
 import { AuthContext } from "./AuthProvider";
 import { EditJournalEntry } from "../modals/EditJournalEntry";
 import { produce } from "immer";
+import { formatDistanceToNow } from "date-fns";
 
 export const JournalList: FC<{
   journals: IJournal[];
@@ -162,7 +163,9 @@ export const JournalList: FC<{
                         opacity: 0.6,
                       }}
                     >
-                      12 March
+                      {(journal as any).timestamp !== undefined
+                        ? formatDistanceToNow(Date.now(), { addSuffix: true })
+                        : "A while back"}
                     </span>
                     <span
                       className={css`
@@ -190,7 +193,7 @@ export const JournalList: FC<{
                     opacity: 0.6,
                   }}
                 >
-                  Bio goes here
+                  {journal.body.substring(0, 20) + "..."}
                 </span>
               </Column>
             </Row>

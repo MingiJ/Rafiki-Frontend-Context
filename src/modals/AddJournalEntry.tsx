@@ -18,9 +18,9 @@ const schema = yup
 
 type FormData = yup.InferType<typeof schema>;
 
-export const AddJournalEntry: FC<{ onAdd: (item: FormData) => void }> = ({
-  onAdd,
-}) => {
+export const AddJournalEntry: FC<{
+  onAdd: (item: FormData & { timestamp: number }) => void;
+}> = ({ onAdd }) => {
   const {
     register,
     handleSubmit,
@@ -46,7 +46,7 @@ export const AddJournalEntry: FC<{ onAdd: (item: FormData) => void }> = ({
       });
       if (response.status !== 200) throw new Error(await response.text());
       toast.success("Journal entry added successfully!");
-      onAdd(data);
+      onAdd({ ...data, timestamp: Date.now() });
     } catch (error: any) {
       toast.error(error.message ?? "Error!");
     }
