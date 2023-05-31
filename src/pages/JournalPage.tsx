@@ -14,6 +14,7 @@ import { ChatContent } from "./ChatContent";
 import { GroupContent } from "./GroupContent";
 import { JournalList } from "./JournalList";
 import { JournalContent } from "./JournalContent";
+import { produce } from "immer";
 
 export const SocketContext = createContext({
   socket: null as null | Socket,
@@ -69,75 +70,19 @@ export const JournalPage = () => {
           height: "90%",
         }}
       >
-        <Row
-          style={{
-            backgroundColor: Theme.colors.gray[800],
-            borderRadius: "2px",
-            position: "relative",
-            alignItems: "flex-start",
-            height: "100%",
+        <JournalList
+          journals={journals}
+          addJournal={(journal) => {
+            setJournals((g) => g.concat(journal));
           }}
-        >
-          <JournalList
-            journals={journals}
-            addJournal={(journal) => {
-              setJournals((g) => g.concat(journal));
-            }}
-          />
-          <Column
-            style={{
-              flex: 1,
-            }}
-          >
-            <Row
-              style={{
-                justifyContent: "space-between",
-                padding: "12px",
-              }}
-            >
-              <Row
-                gap={12}
-                style={{
-                  width: "300px",
-                }}
-              >
-                <AnonAvatar />
-                <Column
-                  style={{
-                    flex: 1,
-                  }}
-                >
-                  <Row
-                    style={{
-                      flex: 1,
-                      justifyContent: "space-between",
-                    }}
-                  >
-                    <span
-                      style={{
-                        fontWeight: 700,
-                      }}
-                    >
-                      {"HelloUser"}
-                    </span>
-                  </Row>
-                  <span
-                    style={{
-                      opacity: 0.6,
-                    }}
-                  >
-                    Bio goes here
-                  </span>
-                </Column>
-              </Row>
-              <Row gap={12}>
-                <span className="material-symbols-outlined">call</span>
-                <span className="material-symbols-outlined">search</span>
-              </Row>
-            </Row>
-            {getActiveJournal() ? <JournalContent /> : "Loading..."}
-          </Column>
-        </Row>
+          editJournal={(journal: IJournal, index: number) => {
+            setJournals(
+              produce((draft) => {
+                draft.splice(index, 1, journal);
+              })
+            );
+          }}
+        />
       </Column>
     </SocketContext.Provider>
   );

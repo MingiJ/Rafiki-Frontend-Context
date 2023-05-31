@@ -8,28 +8,65 @@ import { IconButton } from "../utils/IconButton";
 import { Modal } from "../utils/Modal";
 import { AddGroup } from "./AddGroup";
 import { IJournal, JournalContext } from "./JournalProvider";
+import { AddJournalEntry } from "../modals/AddJournalEntry";
+import { AuthContext } from "./AuthProvider";
+import { EditJournalEntry } from "../modals/EditJournalEntry";
+import { produce } from "immer";
 
 export const JournalList: FC<{
   journals: IJournal[];
   addJournal: (g: IJournal) => void;
-}> = ({ journals, addJournal }) => {
+  editJournal: (newJournal: IJournal, index: number) => void;
+}> = ({ journals, addJournal, editJournal }) => {
   const { getActiveJournal, setActiveJournal } = useContext(JournalContext);
   const activeJournal = getActiveJournal();
   const [addGroupModal, setAddGroupModal] = useState(false);
+  const [editJournalEntry, setEditJournalEntry] = useState({
+    open: false,
+    index: 0,
+  });
+  const { authUserEmail } = useContext(AuthContext);
   return (
     <>
+      <Modal
+        open={editJournalEntry.open}
+        close={() => {
+          setEditJournalEntry(
+            produce((draft) => {
+              draft.open = false;
+            })
+          );
+        }}
+      >
+        {
+          <EditJournalEntry
+            initial={journals[editJournalEntry.index] as IJournal}
+            onEdit={(edited: IJournal) => {
+              editJournal(edited, editJournalEntry.index);
+              setEditJournalEntry(
+                produce((draft) => {
+                  draft.open = false;
+                })
+              );
+            }}
+          />
+        }
+      </Modal>
       <Modal
         open={addGroupModal}
         close={() => {
           setAddGroupModal(false);
         }}
       >
-        {/* <AddGroup
-          onAdd={(g) => {
-            addJournal(g);
+        <AddJournalEntry
+          onAdd={(j) => {
+            addJournal({
+              ...j,
+              owner: authUserEmail(),
+            });
             setAddGroupModal(false);
           }}
-        /> */}
+        />
       </Modal>
       <Column
         gap={36}
@@ -43,7 +80,6 @@ export const JournalList: FC<{
             width: "100%",
           }}
         >
-          <AnonAvatar />
           <input
             className={css`
               flex: 1;
@@ -54,6 +90,7 @@ export const JournalList: FC<{
               outline: none;
               border-radius: 24px;
             `}
+            placeholder="Search Journal Entry..."
           />
         </Row>
         <Column gap={12}>
@@ -72,23 +109,22 @@ export const JournalList: FC<{
               create
             </IconButton>
           </Row>
-          {journals.map((c) => (
+          {journals.map((journal, journalIndex) => (
             <Row
               onClick={() => {
-                if (activeJournal == c) {
+                if (activeJournal == journal) {
                   setActiveJournal(null);
                   return;
                 }
-                setActiveJournal(c);
+                setActiveJournal(journal);
               }}
               gap={12}
               style={{
-                width: "300px",
                 padding: "12px",
                 borderRadius: "6px",
               }}
               className={css`
-                background: ${activeJournal == c
+                background: ${activeJournal == journal
                   ? "linear-gradient(72.47deg, #7367F0 22.16%, rgba(115, 103, 240, 0.7) 76.47%)"
                   : "transparent"};
                 cursor: pointer;
@@ -113,15 +149,41 @@ export const JournalList: FC<{
                       fontWeight: 700,
                     }}
                   >
-                    {c.title}
+                    {journal.title}
                   </span>
-                  <span
+                  <Column
+                    gap={4}
                     style={{
-                      opacity: 0.6,
+                      alignItems: "flex-end",
                     }}
                   >
-                    12 March
-                  </span>
+                    <span
+                      style={{
+                        opacity: 0.6,
+                      }}
+                    >
+                      12 March
+                    </span>
+                    <span
+                      className={css`
+                        &:hover {
+                          color: lightseagreen;
+                        }
+                      `}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setEditJournalEntry({
+                          open: true,
+                          index: journalIndex,
+                        });
+                      }}
+                      style={{
+                        borderBottom: "2px solid #fafafa",
+                      }}
+                    >
+                      Edit
+                    </span>
+                  </Column>
                 </Row>
                 <span
                   style={{
