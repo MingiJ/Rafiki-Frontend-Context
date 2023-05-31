@@ -60,13 +60,7 @@ export const EditJournalEntry: FC<{
   };
 
   return (
-    <Column
-      style={{
-        alignItems: "center",
-        justifyContent: "center",
-        height: "100%",
-      }}
-    >
+    <Column style={{}}>
       <form onSubmit={handleSubmit(onSubmit)}>
         <Column gap={12}>
           <Column>

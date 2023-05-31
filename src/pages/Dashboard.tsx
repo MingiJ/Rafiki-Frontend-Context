@@ -1,16 +1,22 @@
-import { Outlet } from "react-router-dom";
+import { Outlet, useSearchParams } from "react-router-dom";
 import { Sidebar } from "../Sidebar";
 import { Column } from "../utils/Column";
 import { Row } from "../utils/Row";
 import { css } from "@emotion/css";
 import { Theme } from "../utils/Theme";
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import { AuthContext } from "./AuthProvider";
 import { ContactProvider } from "./ContactProvider";
 import { JournalProvider } from "./JournalProvider";
-
+import styled from "styled-components";
+const StyledMenuToggler = styled.span`
+  @media (min-width: 600px) {
+    display: none;
+  }
+`;
 export const Dashboard = () => {
   const { logOut } = useContext(AuthContext);
+  const [sideOpen, setSideOpen] = useState(false);
   return (
     <JournalProvider>
       <ContactProvider>
@@ -22,7 +28,39 @@ export const Dashboard = () => {
             alignItems: "flex-start",
           }}
         >
-          <Sidebar />
+          <div
+            onClick={() => {
+              setSideOpen(false);
+            }}
+            className={css`
+              z-index: 2;
+              position: fixed;
+              top: 0;
+              left: 0;
+              width: 100vw;
+              height: 100vh;
+              backdrop-filter: blur(2px);
+              display: ${sideOpen ? "flex" : "none"};
+              @media (min-width: 600px) {
+                display: none;
+              }
+            `}
+            id={"overlay"}
+          ></div>
+          <div
+            className={css`
+              @media (max-width: 600px) {
+                position: absolute;
+                transform: translateX(${sideOpen ? 0 : -300}px);
+                box-shadow: 2px 4px 4px ${Theme.colors.gray[900]};
+                transition: all 0.2s;
+              }
+              z-index: 3;
+              height: 100%;
+            `}
+          >
+            <Sidebar />
+          </div>
           <Column
             gap={24}
             style={{
@@ -44,14 +82,25 @@ export const Dashboard = () => {
               `}
             >
               <span className="material-symbols-outlined">dark_mode</span>
-              <span
-                className="material-symbols-outlined"
-                onDoubleClick={() => {
-                  logOut();
-                }}
-              >
-                person
-              </span>
+
+              <Row>
+                <span
+                  className="material-symbols-outlined"
+                  onDoubleClick={() => {
+                    logOut();
+                  }}
+                >
+                  person
+                </span>
+                <StyledMenuToggler
+                  className="material-symbols-outlined"
+                  onClick={() => {
+                    setSideOpen(true);
+                  }}
+                >
+                  menu
+                </StyledMenuToggler>
+              </Row>
             </Row>
             <Outlet />
           </Column>
