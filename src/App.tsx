@@ -8,6 +8,7 @@ import { Toaster } from "react-hot-toast";
 import { AuthProvider } from "./pages/AuthProvider";
 import { LogInPage } from "./pages/LogInPage";
 import { ContactProvider } from "./pages/ContactProvider";
+import { JournalPage } from "./pages/JournalPage";
 
 const App = () => {
   return (
@@ -21,6 +22,7 @@ const App = () => {
           <Route path="/app" element={<AuthRoutes />}>
             <Route path="*" element={<Dashboard />}>
               <Route path={"chat"} element={<ChatPage />} />
+              <Route path={"journal"} element={<JournalPage />} />
             </Route>
           </Route>
         </Routes>

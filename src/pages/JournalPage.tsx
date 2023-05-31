@@ -9,19 +9,17 @@ import { Theme } from "../utils/Theme";
 import { ContactList } from "./ContactList";
 import { AnonAvatar } from "./AnonAvatar";
 import { css } from "@emotion/css";
-import { ContactContext, ContactProvider, IGroup } from "./ContactProvider";
+import { JournalContext, IJournal, JournalProvider } from "./JournalProvider";
 import { ChatContent } from "./ChatContent";
 import { GroupContent } from "./GroupContent";
-export interface IContact {
-  email: string;
-  username: string;
-}
+import { JournalList } from "./JournalList";
+import { JournalContent } from "./JournalContent";
 
 export const SocketContext = createContext({
   socket: null as null | Socket,
 });
 
-export const ChatPage = () => {
+export const JournalPage = () => {
   const { authUserEmail, getToken } = useContext(AuthContext);
   const [socket, setSocket] = useState(null as null | Socket);
   useEffect(() => {
@@ -33,42 +31,23 @@ export const ChatPage = () => {
       console.log("An error occurred");
     });
   }, [getToken]);
-  const [groups, setGroups] = useState([] as IGroup[]);
-  const [contacts, setContacts] = useState([] as IContact[]);
+  const [journals, setJournals] = useState([] as IJournal[]);
   const [loading, setLoading] = useState(false);
-  const fetchUsers = async () => {
+  const fetchJournals = async () => {
     setLoading(true);
     try {
-      const response = await fetch(backendUrl + "user/users", {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-      if (response.status !== 200) throw new Error(await response.text());
-      const { users } = await response.json();
-      setContacts(users.filter((u: any) => u.email !== authUserEmail()));
-    } catch (error: any) {
-      console.error(error);
-      toast.error("Error");
-    }
-    setLoading(false);
-  };
-  const fetchGroups = async () => {
-    setLoading(true);
-    try {
-      const response = await fetch(backendUrl + "group/get", {
+      const response = await fetch(backendUrl + "journal/get", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          token: getToken(),
+          owner: getToken(),
         }),
       });
       if (response.status !== 200) throw new Error(await response.text());
-      const { groups } = await response.json();
-      setGroups(groups);
+      const { journals } = await response.json();
+      setJournals(journals);
     } catch (error: any) {
       console.error(error);
       toast.error("Error");
@@ -76,10 +55,9 @@ export const ChatPage = () => {
     setLoading(false);
   };
   useEffect(() => {
-    fetchUsers();
-    fetchGroups();
+    fetchJournals();
   }, []);
-  const { getActiveContact } = useContext(ContactContext);
+  const { getActiveJournal } = useContext(JournalContext);
   if (loading) {
     return <h2>Loading...</h2>;
   }
@@ -100,11 +78,10 @@ export const ChatPage = () => {
             height: "100%",
           }}
         >
-          <ContactList
-            contacts={contacts}
-            groups={groups}
-            addGroup={(group) => {
-              setGroups((g) => g.concat(group));
+          <JournalList
+            journals={journals}
+            addJournal={(journal) => {
+              setJournals((g) => g.concat(journal));
             }}
           />
           <Column
@@ -149,7 +126,7 @@ export const ChatPage = () => {
                       opacity: 0.6,
                     }}
                   >
-                    Available
+                    Bio goes here
                   </span>
                 </Column>
               </Row>
@@ -158,7 +135,7 @@ export const ChatPage = () => {
                 <span className="material-symbols-outlined">search</span>
               </Row>
             </Row>
-            {getActiveContact() ? <ChatContent /> : <GroupContent />}
+            {getActiveJournal() ? <JournalContent /> : "Loading..."}
           </Column>
         </Row>
       </Column>

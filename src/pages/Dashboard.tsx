@@ -7,53 +7,56 @@ import { Theme } from "../utils/Theme";
 import { useContext } from "react";
 import { AuthContext } from "./AuthProvider";
 import { ContactProvider } from "./ContactProvider";
+import { JournalProvider } from "./JournalProvider";
 
 export const Dashboard = () => {
   const { logOut } = useContext(AuthContext);
   return (
-    <ContactProvider>
-      <Row
-        gap={8}
-        style={{
-          height: "100%",
-          position: "relative",
-          alignItems: "flex-start",
-        }}
-      >
-        <Sidebar />
-        <Column
-          gap={24}
+    <JournalProvider>
+      <ContactProvider>
+        <Row
+          gap={8}
           style={{
-            padding: "12px",
-            width: "100%",
             height: "100%",
+            position: "relative",
+            alignItems: "flex-start",
           }}
         >
-          <Row
-            className={css`
-              box-shadow: 0px 2px 7px 1px rgba(51, 48, 60, 0.03),
-                0px 4px 7px 0px rgba(51, 48, 60, 0.02),
-                0px 1px 4px 2px rgba(51, 48, 60, 0.01);
-              width: 100%;
-              padding: 12px;
-              border-radius: ${Theme.spacing[0]};
-              background-color: ${Theme.colors.gray[800]};
-              justify-content: space-between;
-            `}
+          <Sidebar />
+          <Column
+            gap={24}
+            style={{
+              padding: "12px",
+              width: "100%",
+              height: "100%",
+            }}
           >
-            <span className="material-symbols-outlined">dark_mode</span>
-            <span
-              className="material-symbols-outlined"
-              onDoubleClick={() => {
-                logOut();
-              }}
+            <Row
+              className={css`
+                box-shadow: 0px 2px 7px 1px rgba(51, 48, 60, 0.03),
+                  0px 4px 7px 0px rgba(51, 48, 60, 0.02),
+                  0px 1px 4px 2px rgba(51, 48, 60, 0.01);
+                width: 100%;
+                padding: 12px;
+                border-radius: ${Theme.spacing[0]};
+                background-color: ${Theme.colors.gray[800]};
+                justify-content: space-between;
+              `}
             >
-              person
-            </span>
-          </Row>
-          <Outlet />
-        </Column>
-      </Row>
-    </ContactProvider>
+              <span className="material-symbols-outlined">dark_mode</span>
+              <span
+                className="material-symbols-outlined"
+                onDoubleClick={() => {
+                  logOut();
+                }}
+              >
+                person
+              </span>
+            </Row>
+            <Outlet />
+          </Column>
+        </Row>
+      </ContactProvider>
+    </JournalProvider>
   );
 };

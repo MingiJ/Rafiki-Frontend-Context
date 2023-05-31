@@ -108,6 +108,7 @@ export const ChatContent = () => {
   return (
     <Column
       style={{
+        minHeight: "80.2vh",
         maxHeight: "80.2vh",
         backgroundColor: Theme.colors.gray[700],
         flexDirection: "column-reverse",

@@ -4,21 +4,17 @@ import { Row } from "../utils/Row";
 import { Theme } from "../utils/Theme";
 import { AnonAvatar } from "./AnonAvatar";
 import { css } from "@emotion/css";
-import { IContact } from "./ChatPage";
-import { ContactContext, IGroup } from "./ContactProvider";
 import { IconButton } from "../utils/IconButton";
 import { Modal } from "../utils/Modal";
 import { AddGroup } from "./AddGroup";
+import { IJournal, JournalContext } from "./JournalProvider";
 
-export const ContactList: FC<{
-  contacts: IContact[];
-  groups: IGroup[];
-  addGroup: (g: IGroup) => void;
-}> = ({ contacts, groups, addGroup }) => {
-  const { getActiveContact, setActiveContact, getActiveGroup, setActiveGroup } =
-    useContext(ContactContext);
-  const activeContact = getActiveContact();
-  const activeGroup = getActiveGroup();
+export const JournalList: FC<{
+  journals: IJournal[];
+  addJournal: (g: IJournal) => void;
+}> = ({ journals, addJournal }) => {
+  const { getActiveJournal, setActiveJournal } = useContext(JournalContext);
+  const activeJournal = getActiveJournal();
   const [addGroupModal, setAddGroupModal] = useState(false);
   return (
     <>
@@ -28,12 +24,12 @@ export const ContactList: FC<{
           setAddGroupModal(false);
         }}
       >
-        <AddGroup
+        {/* <AddGroup
           onAdd={(g) => {
-            addGroup(g);
+            addJournal(g);
             setAddGroupModal(false);
           }}
-        />
+        /> */}
       </Modal>
       <Column
         gap={36}
@@ -66,24 +62,24 @@ export const ContactList: FC<{
               justifyContent: "space-between",
             }}
           >
-            <h2>Groups</h2>
+            <h2>Journal Entries</h2>
             <IconButton
               className="material-symbols-outlined"
               onClick={() => {
                 setAddGroupModal(true);
               }}
             >
-              group_add
+              create
             </IconButton>
           </Row>
-          {groups.map((c) => (
+          {journals.map((c) => (
             <Row
               onClick={() => {
-                if (activeGroup == c) {
-                  setActiveGroup(null);
+                if (activeJournal == c) {
+                  setActiveJournal(null);
                   return;
                 }
-                setActiveGroup(c);
+                setActiveJournal(c);
               }}
               gap={12}
               style={{
@@ -92,7 +88,7 @@ export const ContactList: FC<{
                 borderRadius: "6px",
               }}
               className={css`
-                background: ${activeGroup == c
+                background: ${activeJournal == c
                   ? "linear-gradient(72.47deg, #7367F0 22.16%, rgba(115, 103, 240, 0.7) 76.47%)"
                   : "transparent"};
                 cursor: pointer;
@@ -101,7 +97,6 @@ export const ContactList: FC<{
                 }
               `}
             >
-              <AnonAvatar />
               <Column
                 style={{
                   flex: 1,
@@ -118,79 +113,7 @@ export const ContactList: FC<{
                       fontWeight: 700,
                     }}
                   >
-                    {c.name}
-                  </span>
-                  <span
-                    style={{
-                      opacity: 0.6,
-                    }}
-                  >
-                    12 March
-                  </span>
-                </Row>
-                <span
-                  style={{
-                    opacity: 0.6,
-                  }}
-                >
-                  Bio goes here
-                </span>
-              </Column>
-            </Row>
-          ))}
-        </Column>
-        <Column gap={12}>
-          <Row
-            style={{
-              justifyContent: "space-between",
-            }}
-          >
-            <h2>Chats</h2>
-          </Row>
-          {contacts.map((c) => (
-            <Row
-              onClick={() => {
-                if (activeContact == c) {
-                  setActiveContact(null);
-                  return;
-                }
-                setActiveContact(c);
-              }}
-              gap={12}
-              style={{
-                width: "300px",
-                padding: "12px",
-                borderRadius: "6px",
-              }}
-              className={css`
-                background: ${activeContact == c
-                  ? "linear-gradient(72.47deg, #7367F0 22.16%, rgba(115, 103, 240, 0.7) 76.47%)"
-                  : "transparent"};
-                cursor: pointer;
-                &:hover {
-                  background-color: ${Theme.colors.gray[600]};
-                }
-              `}
-            >
-              <AnonAvatar />
-              <Column
-                style={{
-                  flex: 1,
-                }}
-              >
-                <Row
-                  style={{
-                    flex: 1,
-                    justifyContent: "space-between",
-                  }}
-                >
-                  <span
-                    style={{
-                      fontWeight: 700,
-                    }}
-                    key={c.email}
-                  >
-                    {c.username}
+                    {c.title}
                   </span>
                   <span
                     style={{
