@@ -9,6 +9,8 @@ import { ContactContext, IGroup } from "./ContactProvider";
 import { IconButton } from "../utils/IconButton";
 import { Modal } from "../utils/Modal";
 import { AddGroup } from "./AddGroup";
+import { GroupContent } from "./GroupContent";
+import { ChatContent } from "./ChatContent";
 
 export const ContactList: FC<{
   contacts: IContact[];
@@ -20,8 +22,25 @@ export const ContactList: FC<{
   const activeContact = getActiveContact();
   const activeGroup = getActiveGroup();
   const [addGroupModal, setAddGroupModal] = useState(false);
+  const [chatContentModal, setChatContentModal] = useState(false);
+  const [groupContentModal, setGroupContentModal] = useState(false);
+
   return (
     <>
+      <Modal
+        open={groupContentModal}
+        close={() => setGroupContentModal(false)}
+        padding={0}
+      >
+        <GroupContent />
+      </Modal>
+      <Modal
+        open={chatContentModal}
+        close={() => setChatContentModal(false)}
+        padding={0}
+      >
+        <ChatContent />
+      </Modal>
       <Modal
         open={addGroupModal}
         close={() => {
@@ -79,6 +98,11 @@ export const ContactList: FC<{
           {groups.map((c) => (
             <Row
               onClick={() => {
+                if (window.innerWidth <= 600) {
+                  setActiveGroup(c);
+                  setGroupContentModal(true);
+                  return;
+                }
                 if (activeGroup == c) {
                   setActiveGroup(null);
                   return;
@@ -87,7 +111,6 @@ export const ContactList: FC<{
               }}
               gap={12}
               style={{
-                width: "300px",
                 padding: "12px",
                 borderRadius: "6px",
               }}
@@ -98,6 +121,10 @@ export const ContactList: FC<{
                 cursor: pointer;
                 &:hover {
                   background-color: ${Theme.colors.gray[600]};
+                }
+                width: 300px;
+                @media (max-width: 600px) {
+                  width: 100%;
                 }
               `}
             >
@@ -150,6 +177,11 @@ export const ContactList: FC<{
           {contacts.map((c) => (
             <Row
               onClick={() => {
+                if (window.innerWidth <= 600) {
+                  setActiveContact(c);
+                  setChatContentModal(true);
+                  return;
+                }
                 if (activeContact == c) {
                   setActiveContact(null);
                   return;
@@ -158,7 +190,6 @@ export const ContactList: FC<{
               }}
               gap={12}
               style={{
-                width: "300px",
                 padding: "12px",
                 borderRadius: "6px",
               }}
@@ -169,6 +200,10 @@ export const ContactList: FC<{
                 cursor: pointer;
                 &:hover {
                   background-color: ${Theme.colors.gray[600]};
+                }
+                width: 300px;
+                @media (max-width: 600px) {
+                  width: 100%;
                 }
               `}
             >

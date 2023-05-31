@@ -100,17 +100,33 @@ export const ChatPage = () => {
             height: "100%",
           }}
         >
-          <ContactList
-            contacts={contacts}
-            groups={groups}
-            addGroup={(group) => {
-              setGroups((g) => g.concat(group));
-            }}
-          />
-          <Column
-            style={{
-              flex: 1,
-            }}
+          <div
+            className={css`
+              @media (max-width: 600px) {
+                width: 100%;
+              }
+            `}
+          >
+            <ContactList
+              contacts={contacts}
+              groups={groups}
+              addGroup={(group) => {
+                setGroups((g) => g.concat(group));
+              }}
+            />
+          </div>
+
+          <div
+            className={css`
+              @media (max-width: 600px) {
+                display: none;
+                background-color: lightseagreen;
+              }
+              display: flex;
+              flex-flow: column;
+              gap: 12px;
+              flex: 1;
+            `}
           >
             <Row
               style={{
@@ -159,7 +175,7 @@ export const ChatPage = () => {
               </Row>
             </Row>
             {getActiveContact() ? <ChatContent /> : <GroupContent />}
-          </Column>
+          </div>
         </Row>
       </Column>
     </SocketContext.Provider>

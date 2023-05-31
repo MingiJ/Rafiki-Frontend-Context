@@ -102,9 +102,13 @@ export const GroupContent = () => {
   }
   return (
     <Column
+      className={css`
+        @media (max-width: 600px) {
+          height: 100%;
+        }
+        height: 80.2vh;
+      `}
       style={{
-        minHeight: "80.2vh",
-        maxHeight: "80.2vh",
         backgroundColor: Theme.colors.gray[700],
         flexDirection: "column-reverse",
       }}

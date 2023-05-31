@@ -13,8 +13,8 @@ const StyledCloseButton = styled.span`
 `;
 
 export const Modal: FC<
-  PropsWithChildren<{ open: boolean; close: () => void }>
-> = ({ open, close, children }) => {
+  PropsWithChildren<{ open: boolean; close: () => void; padding?: number }>
+> = ({ open, close, children, padding = 12 }) => {
   if (!open) return null;
   return createPortal(
     <div
@@ -53,7 +53,7 @@ export const Modal: FC<
             width: 100%;
             height: 100%;
           }
-          padding: 12px;
+          padding: ${padding}px;
           background-color: ${Theme.colors.gray[900]};
           border-radius: 6px;
           min-width: 300px;
