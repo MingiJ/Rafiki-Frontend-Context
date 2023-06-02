@@ -10,7 +10,7 @@ export const JournalContext = createContext({
 });
 
 export interface IJournal {
-  title: string;
+  title?: string;
   owner: string;
   body: string;
 }
