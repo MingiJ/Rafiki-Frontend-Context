@@ -79,7 +79,8 @@ export const ChatPage = () => {
     fetchUsers();
     fetchGroups();
   }, []);
-  const { getActiveContact } = useContext(ContactContext);
+  const { getActiveContact, getActiveGroup } = useContext(ContactContext);
+
   if (loading) {
     return <h2>Loading...</h2>;
   }
@@ -88,7 +89,7 @@ export const ChatPage = () => {
       <Column
         style={{
           position: "relative",
-          height: "90%",
+          height: "100%",
         }}
       >
         <Row
@@ -157,7 +158,9 @@ export const ChatPage = () => {
                         fontWeight: 700,
                       }}
                     >
-                      {"HelloUser"}
+                      {getActiveContact()
+                        ? getActiveContact()?.username
+                        : getActiveGroup()?.name}
                     </span>
                   </Row>
                   <span

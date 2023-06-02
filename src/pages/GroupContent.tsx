@@ -205,7 +205,13 @@ export const GroupContent = () => {
                       ${isActiveContact ? "24px" : "12px"};
                   `}
                 >
-                  <span>{m.username}</span>
+                  <span
+                    className={css`
+                      font-weight: bold;
+                    `}
+                  >
+                    {m.username}
+                  </span>
 
                   <span>{m.content}</span>
                   <span

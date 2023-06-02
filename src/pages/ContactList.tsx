@@ -152,7 +152,7 @@ export const ContactList: FC<{
                       opacity: 0.6,
                     }}
                   >
-                    12 March
+                    {}
                   </span>
                 </Row>
                 <span
@@ -231,16 +231,14 @@ export const ContactList: FC<{
                     style={{
                       opacity: 0.6,
                     }}
-                  >
-                    12 March
-                  </span>
+                  ></span>
                 </Row>
                 <span
                   style={{
                     opacity: 0.6,
                   }}
                 >
-                  Bio goes here
+                  
                 </span>
               </Column>
             </Row>

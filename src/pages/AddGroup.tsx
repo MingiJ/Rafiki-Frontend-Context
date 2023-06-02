@@ -49,7 +49,9 @@ export const AddGroup: FC<{ onAdd: (group: IGroup) => void }> = ({ onAdd }) => {
     members: [],
   });
   const { authUserEmail } = useContext(AuthContext);
-  const [users, setUsers] = useState([] as { email: string }[]);
+  const [users, setUsers] = useState(
+    [] as { email: string; username: string }[]
+  );
   const [members, setMembers] = useState([] as { email: string }[]);
   const fetchUsers = async () => {
     setLoading(true);
@@ -142,8 +144,8 @@ export const AddGroup: FC<{ onAdd: (group: IGroup) => void }> = ({ onAdd }) => {
                 defaultValue={[] as any[]}
                 isMulti
                 name="Members"
-                options={users.map(({ email }) => ({
-                  label: email,
+                options={users.map(({ email, username }) => ({
+                  label: username,
                   value: email,
                 }))}
                 onChange={(newValue) => {
