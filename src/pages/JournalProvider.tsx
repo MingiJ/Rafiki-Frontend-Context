@@ -12,7 +12,7 @@ export const JournalContext = createContext({
 export interface IJournal {
   title?: string;
   owner: string;
-  body: string;
+  body?: string;
 }
 
 export const JournalProvider: FC<PropsWithChildren> = ({ children }) => {
