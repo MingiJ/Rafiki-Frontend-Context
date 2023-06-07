@@ -160,7 +160,6 @@ export const ContactList: FC<{
                     opacity: 0.6,
                   }}
                 >
-                  Bio goes here
                 </span>
               </Column>
             </Row>
